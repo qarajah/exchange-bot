@@ -59,7 +59,8 @@ def checkTrades():
             tradeDict[_sym] = {
                 'lev' : trade['leverage'],
                 'size' : _size,
-                'price' : trade['avgPrice'],
+                'entry' : trade['avgPrice'],
+                'side' : trade['side'],
                 'profit' : trade['takeProfit'],
                 'stop' : trade['stopLoss'],
                 'time' : trade['updatedTime'],

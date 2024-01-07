@@ -91,6 +91,47 @@
                 </table>
                 <br>
 
+                <table class="table table-dark" class="table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col" style="width:10%">Asset</th>
+                        <th scope="col" style="width:10%">Side</th>
+                        <th scope="col" style="width:15%">PNL</th>
+                        <th scope="col" style="width:15%">Entry</th>
+                        <th scope="col" style="width:15%">Stop</th>
+                        <th scope="col" style="width:15%">Profit</th>
+                        <th scope="col" style="width:15%">Lev</th>
+                        <th scope="col" style="width:15%">SL</th>
+                        <th scope="col" style="width:15%">TP</th>
+                        <th scope="col"> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(item, key) in assets" :key="key" >
+                            <tr class="">
+                                <th class= "text-xsmall" :style="getAssetColor(key)" scope="row"><span>[[key.toUpperCase().split('USDT')[0] ]]</span> </th>
+                                <td class="" ><span>[[item.side]]</span></td>
+                                <td class="" ><span>[[item.gains]]</span></td>
+                                <td class="" ><span>[[item.entry]]</span></td>
+                                <td class="" ><span>[[item.stop]]</span></td>
+                                <td class="" ><span>[[item.profit]]</span></td>
+                                <td class="" ><span>[[item.lev]]</span></td>
+                                <td class="">
+                                    <button @click="adjustStop(key)" type="button" class="btn btn btn-danger">
+                                        <span> SL </span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustProfit(key)" type="button" class="btn btn btn-safe">
+                                        <span> TP </span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <br>
+
 
 
 
