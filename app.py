@@ -27,6 +27,7 @@ def home():
 
     return render_template('trading.html', **context)
 
+
 def addAlert(instrument, msg):
     errors = json.loads(r.get('errors'))
 
@@ -51,6 +52,11 @@ def sendMessage(m):
     base_url = url_string + '&text="{}"'.format(m)
     print(base_url)
     requests.get(base_url)
+
+
+@app.route("/ping", methods=['POST'])
+def ping_webhook():
+    return 'PING'
 
 @app.route("/webhook", methods=['POST'])
 def tradingview_webhook():
