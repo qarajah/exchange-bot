@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 from settings import SECRET_KEY, CODE, DEBUG, auth_required, TG_TOKEN, TG_CHAT
 # from exchangeAPI import apiFunds, apiTicker, apiOrder
-from openTrade import placeOrder
+from bybAPI import *
 
 import logging
 # from logger.handlers import SysLogHandler
@@ -45,20 +45,6 @@ def addAlert(instrument, msg):
     r.set('errors', json.dumps(errors))
     return True
 
-
-# def checkTicker(ticker):
-#     logger.warning('CHECK TICKER ' + ticker)
-#     if 'USD' not in ticker:
-#         addAlert(ticker, 'USD not found in ticker')
-#         return False
-
-#     asset = ticker.split('USD')[0]
-#     instrument = getInstruments(asset)
-#     if instrument == None:
-#         addAlert(ticker, 'Asset not found on Kraken futures')
-#         return False
-
-#     return instrument.upper()
 
 def sendMessage(m):
     url_string = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + str(TG_CHAT)
@@ -104,39 +90,45 @@ def tradingview_webhook():
 
     try:
         resp = placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
-        m = 'TRADE RESULT 1 ' + json.dumps(resp)
+        m = 'TRADE RESULT 1 ' + _sym + ' ' + _side + ' ' + resp['retMsg']
         logger.warning(m)
         sendMessage(m)
     except Exception as e:
-        m = 'TRADE RESULT ERROR 1 ' + str(e)
+        m = 'TRADE ERROR 1 ' + _sym + ' ' + _side + ' ' + str(e)
         logger.warning(m)
         sendMessage(m)
 
     return 'TV WEBHOOK COMPLETE'
 
 
-# @app.route('/getData', methods=['POST'])
-# def getData():
-#     pw = request.form ['pw']
-#     if int(pw) != int(CODE):
-#         return {'error' : 'authentication code input required'}
+@app.route('/getData', methods=['POST'])
+def getData():
+    pw = request.form ['pw']
+    if int(pw) != int(CODE):
+        return {'error' : 'authentication code input required'}
 
-#     errors = json.loads(r.get('errors'))
+    # errors = json.loads(r.get('errors'))
 
-#     if 'misc' not in errors:
-#         errors['misc'] = []
-#         r.set('errors', json.dumps(errors))
+    # if 'misc' not in errors:
+    #     errors['misc'] = []
+    #     r.set('errors', json.dumps(errors))
 
-#     dataOBJ = {
-#         'funds' : getFunds(),
-#         'misc' : errors['misc'],
-#         'exchange' : EXCHANGE
-#     }
+    dataOBJ = {
+        'funds' : getFunds(),
+        'misc' : None,
+        'assets' : checkTrades(),
+        'orders' : checkOrders()
+    }
+
+    return json.dumps(dataOBJ)
 
 
-#     # if pw != PASSWORD:
-#     #     return abort
-#     return json.dumps(dataOBJ)
+@app.route('/cancelOrder', methods=['POST'])
+def cancelOrder():
+    _sym = request.form['sym']
+    _id = request.form['id']
+    cancel = cancelAPI(_sym, _id)
+    return cancel
 
 
 # @app.route('/getAssets', methods=['POST'])
