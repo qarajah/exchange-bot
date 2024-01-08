@@ -57,8 +57,12 @@ def sendMessage(m):
 
 @app.route("/ping", methods=['POST'])
 def ping_webhook():
-    data = json.loads(request.data)
-    r.set('vwaps', json.dumps(request.data))
+    try:
+        data = json.loads(request.data)
+        r.set('vwaps', json.dumps(request.data))
+    except:
+        print('PING EXCEPTION')
+
     trades = checkTrades()
     rTrades = []
 
