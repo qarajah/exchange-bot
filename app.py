@@ -58,13 +58,14 @@ def sendMessage(m):
 @app.route("/ping", methods=['POST'])
 def ping_webhook():
     try:
+        print(request.data)
         data = json.loads(request.data)
         r.set('vwaps', json.dumps(request.data))
-    except:
-        print('PING EXCEPTION')
+    except Exception as e:
+        print('PING EXCEPTION', e)
 
     trades = checkTrades()
-    rTrades = []
+    rTrades = {}
 
     if r.get('trades'):
         rTrades = json.loads(r.get('trades'))
@@ -73,7 +74,7 @@ def ping_webhook():
         if t not in rTrades:
             sendMessage('TRADE OPEN ON ' + t)
 
-    r.set('trades', json.dumps(trades.keys()))
+    r.set('trades', json.dumps(trades))
 
     return 'PING'
 
