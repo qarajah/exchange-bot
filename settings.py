@@ -1,5 +1,6 @@
 import json
 import os
+import redis
 from functools import wraps
 from flask import make_response, request
 
@@ -17,6 +18,7 @@ try:
     TG_CHAT = config.TG_CHAT
     LOCAL = True
     DEBUG = True
+    REDIS_URL = config.REDIS_URL
     print('CONFIG SUCCESS')
 except:
     print('ACCESS OS ENVIRON CREDENTIALS')
@@ -28,8 +30,15 @@ except:
     CODE = os.environ['CODE']
     TG_TOKEN = os.environ['TG_TOKEN']
     TG_CHAT = os.environ['TG_CHAT']
+    REDIS_URL = os.environ['REDIS_URL']
     DEBUG = False
 
+if REDIS_URL:
+    if LOCAL:
+        r = redis.from_url(REDIS_URL, ssl_cert_reqs=None, decode_responses=True)
+    else:
+        ## For Render URL
+        r = redis.from_url(REDIS_URL, decode_responses=True)
 
 def auth_required(f):
     @wraps(f)

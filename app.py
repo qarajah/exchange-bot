@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template, jsonify, abort
 import json
 import time
+import redis
 import requests
 from datetime import datetime
-from settings import SECRET_KEY, CODE, DEBUG, auth_required, TG_TOKEN, TG_CHAT
+from settings import SECRET_KEY, CODE, DEBUG, auth_required, TG_TOKEN, TG_CHAT, r
 # from exchangeAPI import apiFunds, apiTicker, apiOrder
 from bybAPI import *
 
@@ -56,6 +57,20 @@ def sendMessage(m):
 
 @app.route("/ping", methods=['POST'])
 def ping_webhook():
+    data = json.loads(request.data)
+    r.set('vwaps', json.dumps(request.data))
+    trades = checkTrades()
+    rTrades = []
+
+    if r.get('trades'):
+        rTrades = json.loads(r.get('trades'))
+
+    for t in trades:
+        if t not in rTrades:
+            sendMessage('TRADE OPEN ON ' + t)
+
+    r.set('trades', json.dumps(trades.keys()))
+
     return 'PING'
 
 @app.route("/webhook", methods=['POST'])
