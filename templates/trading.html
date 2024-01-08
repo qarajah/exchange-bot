@@ -244,6 +244,7 @@ let vue = new Vue({
             })
             .done(function(data) {
                 console.log(data)
+                location.reload()
             })
             .fail(function(){
                   alert('error has occurred cancelOrder');
