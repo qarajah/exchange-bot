@@ -96,9 +96,9 @@ def checkOrders():
             orderDict[_sym] = {
                 'last_price' : last_price,
                 'entry' : float(order['price']),
-                'profit' : float(order['takeProfit']),
-                'stop' : float(order['stopLoss']),
-                'time' : float(order['updatedTime']),
+                'profit' : order['takeProfit'],
+                'stop' : order['stopLoss'],
+                'time' : order['updatedTime'],
                 'side' : order['side'],
                 'qty' : order['qty'],
                 'id' : order['orderId'],
