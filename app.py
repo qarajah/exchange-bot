@@ -62,7 +62,7 @@ def ping_webhook():
         bDec = request.data.decode("utf-8")
         print(bDec)
         data = json.loads(bDec)
-        r.set('vwaps', json.dumps(request.data))
+        r.set('vwaps', json.dumps(bDec))
     except Exception as e:
         print('PING EXCEPTION', e)
 
