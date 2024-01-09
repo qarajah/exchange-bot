@@ -71,22 +71,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <template v-for="(item, key) in orders" :key="key" >
-                            <tr class="">
-                                <th class= "text-xsmall" :style="getAssetColor(key)" scope="row"><span>[[key.toUpperCase().split('USDT')[0] ]]</span> </th>
-                                <td class="" ><span>[[item.side]]</span></td>
-                                <td class="" ><span>[[item.entry]] ([[getDistance(item.entry, item.last_price)]])</span></td>
-                                <td class="" ><span>[[item.stop]]</span></td>
-                                <td class="" ><span>[[item.profit]]</span></td>
-                                <td class="" ><span>[[item.last_price]]</span></td>
-                                <td class="" ><span>[[item.entry * item.qty]]</span></td>
-                                <td class="">
-                                    <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
-                                        <span> X </span>
-                                    </button>
-                                </td>
-                            </tr>
+                        <template v-for="(items, ticker) in orders" :key="ticker" >
+                            <template v-for="(item, key) in items" :key="key" >
+                                <tr v-if="!item.reduce">
+                                    <th class= "text-xsmall" :style="getAssetColor(ticker)" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
+                                    <td class="" ><span>[[item.side]]</span></td>
+                                    <td class="" ><span>[[item.entry]] ([[getDistance(item.entry, item.last_price)]])</span></td>
+                                    <td class="" ><span>[[item.stop]]</span></td>
+                                    <td class="" ><span>[[item.profit]]</span></td>
+                                    <td class="" ><span>[[item.last_price]]</span></td>
+                                    <td class="" ><span>[[item.entry * item.qty]]</span></td>
+                                    <td class="">
+                                        <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
+                                            <span> X </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
                         </template>
+
                     </tbody>
                 </table>
                 <br>
@@ -94,41 +97,85 @@
                 <table class="table table-dark" class="table-responsive">
                     <thead>
                     <tr>
-                        <th scope="col" style="width:10%">Asset</th>
+                        <th scope="col" style="width:10%">Trade</th>
                         <th scope="col" style="width:10%">Side</th>
                         <th scope="col" style="width:15%">PNL</th>
                         <th scope="col" style="width:15%">Entry</th>
                         <th scope="col" style="width:15%">Stop</th>
                         <th scope="col" style="width:15%">Profit</th>
                         <th scope="col" style="width:15%">Lev</th>
-                        <th scope="col" style="width:15%">SL</th>
-                        <th scope="col" style="width:15%">TP</th>
-                        <th scope="col"> </th>
+                        <th scope="col" style="width:15%"></th>
                     </tr>
                     </thead>
                     <tbody>
-                        <template v-for="(item, key) in assets" :key="key" >
+                        <template v-for="(item, ticker) in assets" :key="ticker" >
                             <tr class="">
-                                <th class= "text-xsmall" :style="getAssetColor(key)" scope="row"><span>[[key.toUpperCase().split('USDT')[0] ]]</span> </th>
+                                <th class= "text-xsmall" :style="getAssetColor(ticker)" @click="showAsset=ticker" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
                                 <td class="" ><span>[[item.side]]</span></td>
                                 <td class="" ><span>[[item.gains]]</span></td>
                                 <td class="" ><span>[[item.entry]]</span></td>
                                 <td class="" ><span>[[item.stop]]</span></td>
                                 <td class="" ><span>[[item.profit]]</span></td>
                                 <td class="" ><span>[[item.lev]]</span></td>
+
+                            </tr>
+                            <tr v-if="showAsset == ticker">
                                 <td class="">
-                                    <button @click="adjustStop(key)" type="button" class="btn btn btn-danger">
-                                        <span> SL </span>
+                                    <button @click="adjustStop(key, -1)" type="button" class="btn btn-sm btn-danger">
+                                        <span> SL -50% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustProfit(key)" type="button" class="btn btn btn-safe">
-                                        <span> TP </span>
+                                    <button @click="adjustStop(key, 0)" type="button" class="btn btn-sm btn-danger">
+                                        <span> SL 0% </span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustStop(key, 1)" type="button" class="btn btn-sm btn-danger">
+                                        <span> SL +50% </span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustProfit(key, 0)" type="button" class="btn btn-sm btn-safe">
+                                        <span> TP X</span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustProfit(key, -1)" type="button" class="btn btn-sm btn-safe">
+                                        <span> TP 50%</span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustProfit(key, 1)" type="button" class="btn btn-sm btn-safe">
+                                        <span> TP V</span>
                                     </button>
                                 </td>
                             </tr>
+
+                            <template v-for="(order, key) in orders[ticker]" :key="key" >
+                                <tr v-if="order.reduce && showAsset == ticker">
+                                    <th class= "text-xsmall" :style="getAssetColor(ticker)" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
+                                    <td class="" ><span>[[order.side]]</span></td>
+                                    <td class="" ><span>[[order.entry]] ([[getDistance(order.entry, order.last_price)]])</span></td>
+                                    <td class="" ><span></span></td>
+                                    <td class="" ><span></span></td>
+                                    <td class="" ><span></span></td>
+                                    <td class="" ><span></span></td>
+                                    <td class="">
+                                        <button @click="cancelOrder(ticker, order.id)" type="button" class="btn btn btn-danger">
+                                            <span> X </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+
+
                         </template>
                     </tbody>
+
+
+
+
                 </table>
                 <br>
 
@@ -244,7 +291,7 @@ let vue = new Vue({
             })
             .done(function(data) {
                 console.log(data)
-                location.reload()
+                vue.getData()
             })
             .fail(function(){
                   alert('error has occurred cancelOrder');

@@ -19,7 +19,8 @@ assDict = {
     8 : 'NEARUSDT',
     9 : 'REEFUSDT',
     10 : 'RUNEUSDT',
-    11 : 'SOLUSDT'
+    11 : 'SOLUSDT',
+    12 : 'ORDIUSDT'
 }
 
 def getCat(_sym):
@@ -90,19 +91,24 @@ def checkOrders():
 
 
         if len(orders) > 0:
-            order = orders[0]
-            print(order)
+            for order in orders:
+                print(order)
+                if _sym not in orderDict:
+                    orderDict[_sym] = []
 
-            orderDict[_sym] = {
-                'last_price' : last_price,
-                'entry' : float(order['price']),
-                'profit' : order['takeProfit'],
-                'stop' : order['stopLoss'],
-                'time' : order['updatedTime'],
-                'side' : order['side'],
-                'qty' : order['qty'],
-                'id' : order['orderId'],
-            }
+                if order['price'] != '' and order['price'] != '0':
+                    orderDict[_sym].append({
+                        'last_price' : last_price,
+                        'entry' : float(order['price']),
+                        'profit' : order['takeProfit'],
+                        'stop' : order['stopLoss'],
+                        'time' : order['updatedTime'],
+                        'side' : order['side'],
+                        'qty' : order['qty'],
+                        'id' : order['orderId'],
+                        'reduce' : order['reduceOnly']
+                    })
+
     return orderDict
 
 def setSLTP(_sym):

@@ -59,7 +59,9 @@ def sendMessage(m):
 def ping_webhook():
     try:
         print(request.data)
-        data = json.loads(request.data)
+        bDec = request.data.decode("utf-8")
+        print(bDec)
+        data = json.loads(bDec)
         r.set('vwaps', json.dumps(request.data))
     except Exception as e:
         print('PING EXCEPTION', e)
@@ -73,6 +75,9 @@ def ping_webhook():
     for t in trades:
         if t not in rTrades:
             sendMessage('TRADE OPEN ON ' + t)
+    for t in rTrades:
+        if t not in trades:
+            sendMessage('TRADE CLOSED ON ' + t)
 
     r.set('trades', json.dumps(trades))
 
