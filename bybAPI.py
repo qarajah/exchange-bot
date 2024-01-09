@@ -71,6 +71,17 @@ def checkTrades():
     print(tradeDict)
     return tradeDict
 
+def getLast(_sym):
+    data = session.get_tickers(
+        category="linear",
+        symbol=_sym,
+        )
+    last_price = float(data['result']['list'][0]['lastPrice'])
+
+    return last_price
+
+
+
 def checkOrders():
     orderDict={}
     for _sym in assDict.values():
@@ -79,16 +90,10 @@ def checkOrders():
             symbol=_sym
         )
 
-        data = session.get_tickers(
-            category="linear",
-            symbol=_sym,
-            )
+        last_price = getLast(_sym)
 
-        last_price = float(data['result']['list'][0]['lastPrice'])
 
         orders = resp['result']['list']
-
-
 
         if len(orders) > 0:
             for order in orders:
@@ -111,13 +116,54 @@ def checkOrders():
 
     return orderDict
 
-def setSLTP(_sym):
+def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
+
+    _stop = float(_stop)
+    _entry = float(_entry)
+    if _profit != '':
+        _profit = float(_profit)
+
+    _adjust = _mode.split('-')[0]
+    _action = _mode.split('-')[1]
+    last_price = getLast(_sym)
+
+    if _adjust == 'profit' and _action == 'cancel':
+        _profit == last_price
+    elif _adjust == 'profit' and _action == 'reduce' and _profit != '':
+        if _side == 'Buy':
+            _profit = _entry + (_profit - _entry)/2
+        else:
+            _profit = _entry - (_entry - _profit)/2
+    elif _adjust == 'profit' and _action == 'prop':
+        if _side == 'Buy':
+            _profit = _entry + (_entry - _stop)*2
+        else:
+            _profit = _entry - (_stop - _entry)*2
+    elif _adjust == 'profit' and _action == 'vwap':
+        if _vwap != 0:
+            _profit = _vwap
+
+    elif _adjust == 'stop' and _action == 'reduce':
+        if _side == 'Buy':
+            _stop = _entry - (_entry - _stop)/2
+        else:
+            _stop = _entry + (_stop -_entry)/2
+    elif _adjust == 'stop' and _action == 'profit':
+        if _side == 'Buy':
+            _stop = _entry + (last_price - _entry)/2
+        else:
+            _stop = _entry - (_entry - last_price)/2
+    elif _adjust == 'stop' and _action == 'break':
+        _stop = _entry
+
+
+
     _cat = getCat(_sym)
     resp =session.set_trading_stop(
             category=_cat,
             symbol=_sym,
-            takeProfit="4.8",
-            stopLoss="5",
+            takeProfit=str(_profit),
+            stopLoss=str(_stop),
             # tpTriggerBy="MarkPrice",
             # slTriggerB="IndexPrice",
             # tpslMode="Partial",
@@ -129,7 +175,7 @@ def setSLTP(_sym):
             # slLimitPrice="0.21",
             positionIdx=0,
         )
-    print(resp)
+    return resp
 
 
 def getOrders(_sym):
@@ -284,18 +330,13 @@ def setLeverage(_sym, _entry, _stop, _risk):
 def getQty(_sym, _amt, _lev, _entry):
     _cat = getCat(_sym)
 
-    data = session.get_tickers(
-        category=_cat,
-        symbol=_sym,
-        )
-
     info = session.get_instruments_info(
         category=_cat,
         symbol=_sym,
     )
     qtyStep = info['result']['list'][0]['lotSizeFilter']['qtyStep']
 
-    last_entry = float(data['result']['list'][0]['lastPrice'])
+    last_entry = getLast(_sym)
     print(last_entry)
 
     if _entry == 0:

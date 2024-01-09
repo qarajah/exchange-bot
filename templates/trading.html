@@ -80,7 +80,7 @@
                                     <td class="" ><span>[[item.stop]]</span></td>
                                     <td class="" ><span>[[item.profit]]</span></td>
                                     <td class="" ><span>[[item.last_price]]</span></td>
-                                    <td class="" ><span>[[item.entry * item.qty]]</span></td>
+                                    <td class="" ><span>[[Math.round(item.entry * item.qty)]]</span></td>
                                     <td class="">
                                         <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
                                             <span> X </span>
@@ -121,33 +121,38 @@
                             </tr>
                             <tr v-if="showAsset == ticker">
                                 <td class="">
-                                    <button @click="adjustStop(key, -1)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
                                         <span> SL -50% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustStop(key, 0)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-break', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
                                         <span> SL 0% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustStop(key, 1)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-profit', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
                                         <span> SL +50% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustProfit(key, 0)" type="button" class="btn btn-sm btn-safe">
-                                        <span> TP X</span>
-                                    </button>
-                                </td>
-                                <td class="">
-                                    <button @click="adjustProfit(key, -1)" type="button" class="btn btn-sm btn-safe">
+                                    <button @click="adjustOrder(ticker, 'profit-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
                                         <span> TP 50%</span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustProfit(key, 1)" type="button" class="btn btn-sm btn-safe">
+                                    <button @click="adjustOrder(ticker, 'profit-prop', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
+                                        <span> TP 2:1%</span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustOrder(ticker, 'profit-vwap', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
                                         <span> TP V</span>
+                                    </button>
+                                </td>
+                                <td class="">
+                                    <button @click="adjustOrder(ticker, 'profit-cancel', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-safe">
+                                        <span> TP X</span>
                                     </button>
                                 </td>
                             </tr>
@@ -295,6 +300,30 @@ let vue = new Vue({
             })
             .fail(function(){
                   alert('error has occurred cancelOrder');
+            });
+        },
+        adjustOrder: function (key, mode, stop, profit, entry, side) {
+            $.ajax({
+                data : {
+                    pw: this.passcode,
+                    _sym : key,
+                    _mode : mode,
+                    _stop : stop,
+                    _profit : profit,
+                    _entry : entry,
+                    _side : side
+                },
+                type : 'POST',
+                url : '/adjustOrder'
+            })
+            .done(function(data) {
+                result = JSON.parse(data)
+                console.log(result)
+                alert(JSON.stringify(result.response))
+                vue.getData()
+            })
+            .fail(function(){
+                  alert('error has occurred adjustOrder');
             });
         },
         getDistance: function(a,b){

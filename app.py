@@ -153,6 +153,47 @@ def getData():
 
     return json.dumps(dataOBJ)
 
+def getVWAP(ticker):
+    vwapsGet = r.get('vwaps')
+
+    if not vwapsGet:
+        r.set(vwapsGet, json.dumps({ticker:"0/0"}))
+        return 0
+    else:
+        vwaps = json.loads(vwapsGet)
+        print(vwaps)
+        print(ticker in vwaps)
+        print(len(vwaps))
+        if ticker in vwaps:
+
+            vwap_D = vwaps[ticker].split('/')[0]
+            vwap_W = vwaps[ticker].split('/')[1]
+            return vwap_D
+        else:
+            return 0
+
+@app.route('/adjustOrder', methods=['POST'])
+def adjustOrder():
+    pw = request.form ['pw']
+    _sym = request.form ['_sym']
+    _mode = request.form ['_mode']
+    _stop = request.form ['_stop']
+    _profit = request.form ['_profit']
+    _entry = request.form ['_entry']
+    _side = request.form ['_side']
+    if int(pw) != int(CODE):
+        return {'error' : 'authentication code input required'}
+
+    _vwap = getVWAP(_sym)
+
+    result = adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap)
+
+    dataOBJ = {
+        'response' : result
+    }
+
+    return json.dumps(dataOBJ)
+
 
 @app.route('/cancelOrder', methods=['POST'])
 def cancelOrder():
