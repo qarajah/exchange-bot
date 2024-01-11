@@ -140,6 +140,12 @@ def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
         else:
             _profit = _entry - (_stop - _entry)*2
     elif _adjust == 'profit' and _action == 'vwap':
+        print('VWAP ', _vwap)
+        if _side == 'Buy' and _vwap != 0 and _vwap > float(_entry):
+            _profit = _vwap
+        elif _vwap != 0 and _vwap < float(_entry):
+            _profit = _vwap
+
         if _vwap != 0:
             _profit = _vwap
 

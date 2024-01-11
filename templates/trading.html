@@ -22,77 +22,37 @@
                 <table class="table table-dark" class="table-responsive">
                     <thead>
                     <tr>
-                        <th scope="col" colspan='3'><h3>Bot Dashboard</h3></th>
-                    </tr>
-                    </thead>
-                <tbody>
-                    <tr>
-
-                    </tr>
-                    <tr>
-                        <th class="" scope="row"><span @click="">Exchange</span> </th>
-                        <td class="" style="color:#C97CFE " scope="row"><span @click="">Bybit</span> </td>
-                    </tr>
-                    <tr>
-                        <th class="" scope="row"><span @click="">Funds </span> </th>
-                        <td class="text-warning" scope="row"><span>  </span> [[funds]] </td>
-                        <td class="text-warning" scope="row"><span @click="">Open Positions %</span> </td>
-                        <td class="text-warning" scope="row"><span > Tot Allocations %</span> </td>
-                    </tr>
-
-                    <tr>
-                        <th class="" scope="row"><span @click="">Auth Code</span></th>
-                        <td>
-                            <input type="number" class="bg-dark text-white" v-model="passcode"> </input>
-                        </td>
-                        <td>
-                            <button @click="getData()" type="button" class="btn btn-sm btn-secondary"> [[API]] </button>
-                        </td>
-                    </tr>
-
-                </tbody>
-
-                </table>
-
-
-
-                <table class="table table-dark" class="table-responsive">
-                    <thead>
-                    <tr>
-                        <th scope="col" style="width:10%">Asset</th>
-                        <th scope="col" style="width:10%">Side</th>
-                        <th scope="col" style="width:15%">Entry</th>
-                        <th scope="col" style="width:15%">Stop</th>
-                        <th scope="col" style="width:15%">Profit</th>
-                        <th scope="col" style="width:15%">Last</th>
-                        <th scope="col" style="width:15%">Size</th>
-                        <th scope="col" style="width:15%">C</th>
-                        <th scope="col"> </th>
+                        <th scope="col" colspan='3' ><h3 style="color:white">Bot Dashboard</h3></th>
                     </tr>
                     </thead>
                     <tbody>
-                        <template v-for="(items, ticker) in orders" :key="ticker" >
-                            <template v-for="(item, key) in items" :key="key" >
-                                <tr v-if="!item.reduce">
-                                    <th class= "text-xsmall" :style="getAssetColor(ticker)" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
-                                    <td class="" ><span>[[item.side]]</span></td>
-                                    <td class="" ><span>[[item.entry]] ([[getDistance(item.entry, item.last_price)]])</span></td>
-                                    <td class="" ><span>[[item.stop]]</span></td>
-                                    <td class="" ><span>[[item.profit]]</span></td>
-                                    <td class="" ><span>[[item.last_price]]</span></td>
-                                    <td class="" ><span>[[Math.round(item.entry * item.qty)]]</span></td>
-                                    <td class="">
-                                        <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
-                                            <span> X </span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </template>
+                        <tr>
+
+                        </tr>
+                        <tr>
+                            <th class="" scope="row"><span @click="">Exchange</span> </th>
+                            <td class="" style="color:#C97CFE " scope="row"><span @click="">Bybit</span> </td>
+                        </tr>
+                        <tr>
+                            <th class="" scope="row"><span @click="">Funds </span> </th>
+                            <td class="text-warning" scope="row"><span>  </span> [[funds]] </td>
+                            <td class="text-warning" scope="row"><span @click="">Open Positions %</span> </td>
+                            <td class="text-warning" scope="row"><span > Tot Allocations %</span> </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <button @click="getData()" type="button" class="btn btn btn-secondary"> [[API]] </button>
+                            </td>
+                            <td class="" scope="row"><span @click="">Auth Code</span></td>
+                            <td>
+                                <input type="number" style="width:50%" class="bg-dark text-white" v-model="passcode"> </input>
+                            </td>
+                        </tr>
 
                     </tbody>
+
                 </table>
-                <br>
 
                 <table class="table table-dark" class="table-responsive">
                     <thead>
@@ -111,7 +71,7 @@
                         <template v-for="(item, ticker) in assets" :key="ticker" >
                             <tr class="">
                                 <th class= "text-xsmall" :style="getAssetColor(ticker)" @click="showAsset=ticker" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
-                                <td class="" ><span>[[item.side]]</span></td>
+                                <td :class="getSideColor(item.side)" ><span>[[item.side]]</span></td>
                                 <td class="" ><span>[[item.gains]]</span></td>
                                 <td class="" ><span>[[item.entry]]</span></td>
                                 <td class="" ><span>[[item.stop]]</span></td>
@@ -142,7 +102,7 @@
                                 </td>
                                 <td class="">
                                     <button @click="adjustOrder(ticker, 'profit-prop', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
-                                        <span> TP 2:1%</span>
+                                        <span> TP 2:1</span>
                                     </button>
                                 </td>
                                 <td class="">
@@ -160,7 +120,7 @@
                             <template v-for="(order, key) in orders[ticker]" :key="key" >
                                 <tr v-if="order.reduce && showAsset == ticker">
                                     <th class= "text-xsmall" :style="getAssetColor(ticker)" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
-                                    <td class="" ><span>[[order.side]]</span></td>
+                                    <td :class="getSideColor(order.side)"><span>[[order.side]]</span></td>
                                     <td class="" ><span>[[order.entry]] ([[getDistance(order.entry, order.last_price)]])</span></td>
                                     <td class="" ><span></span></td>
                                     <td class="" ><span></span></td>
@@ -179,8 +139,44 @@
                     </tbody>
 
 
+                </table>
+                <br>
 
+                <table class="table table-dark" class="table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col" style="width:10%">Asset</th>
+                        <th scope="col" style="width:10%">Side</th>
+                        <th scope="col" style="width:15%">Entry</th>
+                        <th scope="col" style="width:15%">Stop</th>
+                        <th scope="col" style="width:15%">Profit</th>
+                        <th scope="col" style="width:15%">Last</th>
+                        <th scope="col" style="width:15%">Size</th>
+                        <th scope="col" style="width:15%">C</th>
+                        <th scope="col"> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(items, ticker) in orders" :key="ticker" >
+                            <template v-for="(item, key) in items" :key="key" >
+                                <tr v-if="!item.reduce">
+                                    <th class= "text-xsmall" :style="getAssetColor(ticker)" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
+                                    <td :class="getSideColor(item.side)"><span>[[item.side]]</span></td>
+                                    <td class="" ><span>[[item.entry]] ([[getDistance(item.entry, item.last_price)]])</span></td>
+                                    <td class="" ><span>[[item.stop]]</span></td>
+                                    <td class="" ><span>[[item.profit]]</span></td>
+                                    <td class="" ><span>[[item.last_price]]</span></td>
+                                    <td class="" ><span>[[Math.round(item.entry * item.qty)]]</span></td>
+                                    <td class="">
+                                        <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
+                                            <span> X </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
 
+                    </tbody>
                 </table>
                 <br>
 
@@ -192,13 +188,6 @@
 
 
 
-
-
-
-
-            </div> <!-- end trading desk-->
-
-            <div :class="getMargin()" id="records">
 
 
 
@@ -412,9 +401,10 @@ let vue = new Vue({
             return {color:'white'}
         },
         getSideColor: function (side) {
+            console.log(side)
             let sideClass = {
-                buy : "text-success text-uppercase font-weight-bold",
-                sell : "text-danger text-uppercase font-weight-bold"
+                Buy : "text-success text-uppercase font-weight-bold",
+                Sell : "text-danger text-uppercase font-weight-bold"
             }
             return sideClass[side]
         },
@@ -483,50 +473,6 @@ let vue = new Vue({
             .fail(function(){
                   alert('error has occurred getAssets');
             });
-        },
-        setAsset: function (asset) {
-            // console.log('setAssets', this.parameters)
-
-
-
-            params = this.parameters
-
-
-            $.ajax({
-                data : {
-                    pw: this.passcode,
-                    asset: asset,
-                    stop: params['stop'],
-                    lev: params['lev'],
-                    prop: params['prop']
-                },
-                type : 'POST',
-                url : '/setAsset'
-
-            })
-            .done(function(data) {
-                if (data.error) {
-                    alert(data.error)
-                    console.log(data.error)
-                    vue.editAsset = ''
-                } else {
-                    localStorage.setItem('code', vue.passcode)
-                    location.reload()
-                }
-
-            })
-            .fail(function(){
-                  alert('error has occurred setAsset');
-            });
-        },
-        checkDelete: function (asset, position) {
-            if (position) {
-                alert('Please close postion before deleting asset')
-                return false
-            }
-
-            this.assetDelete = asset
-            alert('Are you sure you want to remove ' + asset + ' from the bot list?')
         },
         authDelete: function (asset) {
             // console.log('authDelete', this.assetDelete)

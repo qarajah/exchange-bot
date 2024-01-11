@@ -121,11 +121,14 @@ def tradingview_webhook():
 
     try:
         resp = placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
-        m = 'TRADE RESULT 1 ' + _sym + ' ' + _side + ' ' + resp['retMsg']
+        tag = resp
+        if type(resp) == dict:
+            tag = resp['retMsg']
+        m = 'TRADE RESULT ' + _sym + ' ' + _side + ' ' + tag
         logger.warning(m)
         sendMessage(m)
     except Exception as e:
-        m = 'TRADE ERROR 1 ' + _sym + ' ' + _side + ' ' + str(e)
+        m = 'TRADE ERROR ' + _sym + ' ' + _side + ' ' + str(e)
         logger.warning(m)
         sendMessage(m)
 
@@ -153,22 +156,23 @@ def getData():
 
     return json.dumps(dataOBJ)
 
-def getVWAP(ticker):
+def getVWAP(tickerusdt):
     vwapsGet = r.get('vwaps')
+
+    ticker = tickerusdt.split('USDT')[0]
 
     if not vwapsGet:
         r.set(vwapsGet, json.dumps({ticker:"0/0"}))
+        print('NO VWAPS', ticker)
         return 0
     else:
         vwaps = json.loads(vwapsGet)
         print(vwaps)
-        print(ticker in vwaps)
-        print(len(vwaps))
+        print(ticker, ticker in vwaps)
         if ticker in vwaps:
-
             vwap_D = vwaps[ticker].split('/')[0]
             vwap_W = vwaps[ticker].split('/')[1]
-            return vwap_D
+            return float(vwap_D)
         else:
             return 0
 
