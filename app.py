@@ -203,6 +203,7 @@ def adjustOrder():
 def cancelOrder():
     _sym = request.form['sym']
     _id = request.form['id']
+    print(_sym, _id)
     cancel = cancelAPI(_sym, _id)
     return cancel
 

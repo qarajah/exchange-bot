@@ -168,7 +168,7 @@
                                     <td class="" ><span>[[item.last_price]]</span></td>
                                     <td class="" ><span>[[Math.round(item.entry * item.qty)]]</span></td>
                                     <td class="">
-                                        <button @click="cancelOrder(key, item.id)" type="button" class="btn btn btn-danger">
+                                        <button @click="cancelOrder(ticker, item.id)" type="button" class="btn btn btn-danger">
                                             <span> X </span>
                                         </button>
                                     </td>
@@ -274,6 +274,7 @@ let vue = new Vue({
     },
     methods: {
         cancelOrder: function (asset, id) {
+            console.log(asset, id)
             $.ajax({
                 data : {
                     pw: this.passcode,

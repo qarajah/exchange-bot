@@ -116,6 +116,32 @@ def checkOrders():
 
     return orderDict
 
+def setSLTP(_sym, _profit, _stop):
+    _cat = getCat(_sym)
+    resp =session.set_trading_stop(
+            category=_cat,
+            symbol=_sym,
+            takeProfit=str(_profit),
+            stopLoss=str(_stop),
+            # tpTriggerBy="MarkPrice",
+            # slTriggerB="IndexPrice",
+            # tpslMode="Partial",
+            # tpOrderType="Limit",
+            # slOrderType="Limit",
+            # tpSize="50",
+            # slSize="50",
+            # tpLimitPrice="0.57",
+            # slLimitPrice="0.21",
+            positionIdx=0
+        )
+    return resp
+
+def autoAdjust(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
+
+    resp = setSLTP(_sym, _profit, _stop)
+
+    return resp
+
 def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
 
     _stop = float(_stop)
@@ -163,24 +189,8 @@ def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
         _stop = _entry
 
 
+    resp = setSLTP(_sym, _profit, _stop)
 
-    _cat = getCat(_sym)
-    resp =session.set_trading_stop(
-            category=_cat,
-            symbol=_sym,
-            takeProfit=str(_profit),
-            stopLoss=str(_stop),
-            # tpTriggerBy="MarkPrice",
-            # slTriggerB="IndexPrice",
-            # tpslMode="Partial",
-            # tpOrderType="Limit",
-            # slOrderType="Limit",
-            # tpSize="50",
-            # slSize="50",
-            # tpLimitPrice="0.57",
-            # slLimitPrice="0.21",
-            positionIdx=0,
-        )
     return resp
 
 
@@ -239,16 +249,6 @@ def getPosition(_sym):
 
     #print(response)
     return dataDict
-
-def setLeverage(_sym):
-    _cat = getCat(_sym)
-
-    response = session.set_leverage(
-        category=_cat,
-        symbol=_sym,
-        buyLeverage="6",
-        sellLeverage="6",
-    )
 
 def checkValid(_sym):
     _cat = getCat(_sym)
@@ -389,7 +389,7 @@ def placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk):
                 symbol=_sym,
                 side=_side,
                 orderType=_type,
-                qty=str(round(_qty, 2)),
+                qty=str(round(_qty, 3)),
                 price=str(_entry),
                 stopLoss=str(_stop),
                 takeProfit=str(_profit),
