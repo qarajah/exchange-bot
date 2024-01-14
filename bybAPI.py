@@ -136,14 +136,39 @@ def setSLTP(_sym, _profit, _stop):
         )
     return resp
 
-def autoAdjust(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
+def autoAdjust(_sym, _stop, _profit, _entry, _side):
+    last_price = getLast(_sym)
+    action = False
+    if _side == 'Buy':
+        _diff = _profit - _entry
+        if last_price > _entry + _diff*0.7:
+            newStop = _entry + _diff*0.4
+            if _stop != newStop:
+                _stop = newStop
+                action = True
+        elif last_price > _entry + _diff*0.4 and _stop != _entry:
+            _stop = _entry
+            action = True
+    else:
+        _diff = _entry - _profit
+        if last_price < _entry - _diff*0.7:
+            newStop = _entry - _diff*0.4
+            if _stop != newStop:
+                _stop = newStop
+                action = True
 
-    resp = setSLTP(_sym, _profit, _stop)
+        elif last_price < _entry - _diff*0.4 and _stop != _entry:
+            _stop = _entry
+            action = True
 
-    return resp
+    if action:
+        resp = setSLTP(_sym, _profit, _stop)
+        return resp
+    else:
+        return False
 
 def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
-
+    print('ADJUST 1', _mode, _sym, _entry, _profit, _stop)
     _stop = float(_stop)
     _entry = float(_entry)
     if _profit != '':
@@ -187,6 +212,8 @@ def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
             _stop = _entry - (_entry - last_price)/2
     elif _adjust == 'stop' and _action == 'break':
         _stop = _entry
+
+    print('ADJUST 2', _mode, _sym, _entry, _profit, _stop)
 
 
     resp = setSLTP(_sym, _profit, _stop)

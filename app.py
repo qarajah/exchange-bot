@@ -66,6 +66,7 @@ def ping_webhook():
     except Exception as e:
         print('PING EXCEPTION', e)
 
+
     trades = checkTrades()
     rTrades = {}
 
@@ -73,6 +74,17 @@ def ping_webhook():
         rTrades = json.loads(r.get('trades'))
 
     for t in trades:
+        try:
+            _sym = t
+            _side = trades[t]['side']
+            _profit = trades[t]['profit']
+            _entry = trades[t]['entry']
+            _stop = trades[t]['stop']
+            resp = autoAdjust(_sym, _stop, _profit, _entry, _side)
+            print('AUTO', resp)
+        except Exception as e:
+            print('AUTO EXCEPTION', e)
+
         if t not in rTrades:
             sendMessage('TRADE OPEN ON ' + t)
     for t in rTrades:
