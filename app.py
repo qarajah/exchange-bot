@@ -53,6 +53,34 @@ def sendMessage(m):
     base_url = url_string + '&text="{}"'.format(m)
     print(base_url)
     requests.get(base_url)
+    return True
+
+@app.route("/auto", methods=['POST'])
+def checkAuto():
+    _sym = None
+    try:
+        _sym = request.form ['sym']
+        print('autoSwitch', _sym)
+    except:
+        print('autoCheck No _sym')
+
+    autoDict = {}
+    if not r.get('auto'):
+        r.set('auto', json.dumps(autoDict))
+    else:
+        autoDict = json.loads(r.get('auto'))
+
+    orderDict = checkOrders()
+    for a in orderDict:
+        if a not in autoDict:
+            autoDict[a] = True
+
+    if _sym and _sym in autoDict:
+        autoDict[_sym] = not autoDict[_sym]
+        r.set('auto', json.dumps(autoDict))
+
+    return autoDict
+
 
 
 @app.route("/ping", methods=['POST'])
@@ -73,15 +101,23 @@ def ping_webhook():
     if r.get('trades'):
         rTrades = json.loads(r.get('trades'))
 
+    autoDict = checkAuto()
+
     for t in trades:
         try:
-            _sym = t
-            _side = trades[t]['side']
-            _profit = trades[t]['profit']
-            _entry = trades[t]['entry']
-            _stop = trades[t]['stop']
-            resp = autoAdjust(_sym, _stop, _profit, _entry, _side)
-            print('AUTO', resp)
+            print('AUTO TRY ', t, _stop, _profit, _entry, _side)
+            if autoDict[t]:
+                _sym = t
+                _side = trades[t]['side']
+                _profit = float(trades[t]['profit'])
+                _entry = float(trades[t]['entry'])
+                _stop = float(trades[t]['stop'])
+                resp = autoAdjust(_sym, _stop, _profit, _entry, _side)
+                print('AUTO RESULT', resp)
+                if resp != False:
+                    sendMessage('AUTO ACTION ON '+ json.dumps(resp) )
+            else:
+                sendMessage('NO AUTO ACTION ON ' + t )
         except Exception as e:
             print('AUTO EXCEPTION', e)
 
@@ -92,6 +128,7 @@ def ping_webhook():
             sendMessage('TRADE CLOSED ON ' + t)
 
     r.set('trades', json.dumps(trades))
+
 
     return 'PING'
 
@@ -163,7 +200,8 @@ def getData():
         'funds' : getFunds(),
         'misc' : None,
         'assets' : checkTrades(),
-        'orders' : checkOrders()
+        'orders' : checkOrders(),
+        'auto' : checkAuto()
     }
 
     return json.dumps(dataOBJ)

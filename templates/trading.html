@@ -63,7 +63,9 @@
                         <th scope="col" style="width:15%">Entry</th>
                         <th scope="col" style="width:15%">Stop</th>
                         <th scope="col" style="width:15%">Profit</th>
+                        <th scope="col" style="width:15%">RR</th>
                         <th scope="col" style="width:15%">Lev</th>
+                        <th scope="col" style="width:15%">Auto</th>
                         <th scope="col" style="width:15%"></th>
                     </tr>
                     </thead>
@@ -72,46 +74,52 @@
                             <tr class="">
                                 <th class= "text-xsmall" :style="getAssetColor(ticker)" @click="showAsset=ticker" scope="row"><span>[[ticker.toUpperCase().split('USDT')[0] ]]</span> </th>
                                 <td :class="getSideColor(item.side)" ><span>[[item.side]]</span></td>
-                                <td class="" ><span>[[item.gains]]</span></td>
+                                <td :class="getPNLColor(item.gains)" ><span>[[item.gains]]</span></td>
                                 <td class="" ><span>[[item.entry]]</span></td>
                                 <td class="" ><span>[[item.stop]]</span></td>
                                 <td class="" ><span>[[item.profit]]</span></td>
+                                <td class="" ><span>[[getRR(item.entry, item.stop, item.profit)]]</span></td>
                                 <td class="" ><span>[[item.lev]]</span></td>
+                                <td class="">
+                                    <button @click="autoSwitch(ticker)" type="button" :class="getAutoColor(ticker)">
+                                        <span> [[getAuto(ticker)]] </span>
+                                    </button>
+                                </td>
 
                             </tr>
                             <tr v-if="showAsset == ticker">
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'stop-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-danger">
                                         <span> SL -50% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'stop-break', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-break', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-danger">
                                         <span> SL 0% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'stop-profit', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-danger">
+                                    <button @click="adjustOrder(ticker, 'stop-profit', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-danger">
                                         <span> SL +50% </span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'profit-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
+                                    <button @click="adjustOrder(ticker, 'profit-reduce', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-success">
                                         <span> TP -50%</span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'profit-prop', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
+                                    <button @click="adjustOrder(ticker, 'profit-prop', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-success">
                                         <span> TP 2:1</span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'profit-vwap', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-success">
+                                    <button @click="adjustOrder(ticker, 'profit-vwap', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline-success">
                                         <span> TP V</span>
                                     </button>
                                 </td>
                                 <td class="">
-                                    <button @click="adjustOrder(ticker, 'profit-cancel', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-safe">
+                                    <button @click="adjustOrder(ticker, 'profit-cancel', item.stop, item.profit, item.entry, item.side)" type="button" class="btn btn-sm btn-outline">
                                         <span> TP X</span>
                                     </button>
                                 </td>
@@ -151,7 +159,9 @@
                         <th scope="col" style="width:15%">Stop</th>
                         <th scope="col" style="width:15%">Profit</th>
                         <th scope="col" style="width:15%">Last</th>
+                        <th scope="col" style="width:15%">RR</th>
                         <th scope="col" style="width:15%">Size</th>
+                        <th scope="col" style="width:15%">Auto</th>
                         <th scope="col" style="width:15%">C</th>
                         <th scope="col"> </th>
                     </tr>
@@ -166,9 +176,15 @@
                                     <td class="" ><span>[[item.stop]]</span></td>
                                     <td class="" ><span>[[item.profit]]</span></td>
                                     <td class="" ><span>[[item.last_price]]</span></td>
+                                    <td class="" ><span>[[getRR(item.entry, item.stop, item.profit)]]</span></td>
                                     <td class="" ><span>[[Math.round(item.entry * item.qty)]]</span></td>
                                     <td class="">
-                                        <button @click="cancelOrder(ticker, item.id)" type="button" class="btn btn btn-danger">
+                                        <button @click="autoSwitch(ticker)" type="button" :class="getAutoColor(ticker)">
+                                            <span> [[getAuto(ticker)]] </span>
+                                        </button>
+                                    </td>
+                                    <td class="">
+                                        <button @click="cancelOrder(ticker, item.id)" type="button" class="btn btn-sm btn-outline-danger">
                                             <span> X </span>
                                         </button>
                                     </td>
@@ -255,6 +271,7 @@ let vue = new Vue({
         passcode: 0,
         assets: {},
         orders: {},
+        auto: {},
         errors: {},
         editAsset: '',
         totalProp: 0,
@@ -273,6 +290,24 @@ let vue = new Vue({
         }
     },
     methods: {
+        autoSwitch: function (asset) {
+            console.log('autoSwitch', asset)
+            $.ajax({
+                data : {
+                    pw: this.passcode,
+                    sym : asset
+                },
+                type : 'POST',
+                url : '/auto'
+            })
+            .done(function(data) {
+                console.log(data)
+                vue.getData()
+            })
+            .fail(function(){
+                  alert('error has occurred cancelOrder');
+            });
+        },
         cancelOrder: function (asset, id) {
             console.log(asset, id)
             $.ajax({
@@ -330,6 +365,25 @@ let vue = new Vue({
             let a = this.assets[asset]
             return a[mode].length
 
+        },
+        getRR: function (entry, stop, profit) {
+            let r1 = Math.abs(entry-profit)
+            let r2 = Math.abs(entry-stop)
+            let rr = r1/r2
+            return rr.toFixed(2)
+        },
+        getAuto: function (ticker) {
+            console.log(ticker, vue.auto[ticker])
+            return vue.auto[ticker]
+        },
+        getAutoColor: function (ticker) {
+            console.log(ticker, vue.auto[ticker])
+            if (vue.auto[ticker]){
+                return 'btn btn-sm btn-outline-info'
+            }
+            else {
+                return 'btn btn-sm btn-outline-danger'
+            }
         },
         toggleData: function (asset) {
             this.showAsset = asset
@@ -409,6 +463,19 @@ let vue = new Vue({
             }
             return sideClass[side]
         },
+        getPNLColor: function (pnl) {
+            console.log(pnl)
+            let PNLClass = {
+                pos : "text-success font-weight-bold",
+                neg : "text-danger font-weight-bold"
+            }
+
+            if (pnl > 0) {
+                return PNLClass['pos']
+            } else {
+                return PNLClass['neg']
+            }
+        },
         getLevStyle: function (lev, lastlev) {
             if (lastlev && lev != lastlev) {
                 return 'background:#851600'
@@ -440,6 +507,7 @@ let vue = new Vue({
                     console.log(parseData)
                     vue.assets = parseData.assets
                     vue.orders = parseData.orders
+                    vue.auto = parseData.auto
                     localStorage.setItem('code', vue.passcode )
                     vue.API = 'API'
                 }
