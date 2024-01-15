@@ -105,13 +105,14 @@ def ping_webhook():
 
     for t in trades:
         try:
-            print('AUTO TRY ', t, _stop, _profit, _entry, _side)
+
             if autoDict[t]:
                 _sym = t
                 _side = trades[t]['side']
                 _profit = float(trades[t]['profit'])
                 _entry = float(trades[t]['entry'])
                 _stop = float(trades[t]['stop'])
+                print('AUTO TRY ', t, _stop, _profit, _entry, _side)
                 resp = autoAdjust(_sym, _stop, _profit, _entry, _side)
                 print('AUTO RESULT', resp)
                 if resp != False:
