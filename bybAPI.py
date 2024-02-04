@@ -1,4 +1,4 @@
-from settings import API_KEY, API_SECRET, LOCAL
+from settings import API_KEY, API_SECRET, LOCAL, ASSETS
 import json
 from pybit.unified_trading import HTTP
 
@@ -146,7 +146,7 @@ def autoAdjust(_sym, _stop, _profit, _entry, _side):
             if _stop != newStop:
                 _stop = newStop
                 action = True
-        elif last_price > _entry + _diff*0.4 and _stop != _entry:
+        elif last_price > _entry + _diff*0.4 and _stop < _entry:
             _stop = _entry
             action = True
     else:
@@ -157,7 +157,7 @@ def autoAdjust(_sym, _stop, _profit, _entry, _side):
                 _stop = newStop
                 action = True
 
-        elif last_price < _entry - _diff*0.4 and _stop != _entry:
+        elif last_price < _entry - _diff*0.4 and _stop > _entry:
             _stop = _entry
             action = True
 
@@ -387,7 +387,7 @@ def getQty(_sym, _amt, _lev, _entry):
 
     return rQty
 
-def placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk):
+def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk):
     _cat = getCat(_sym)
 
     print('CHECK VALID')
