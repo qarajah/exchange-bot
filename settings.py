@@ -40,6 +40,12 @@ if REDIS_URL:
         ## For Render URL
         r = redis.from_url(REDIS_URL, decode_responses=True)
 
+
+if not r.get('ASSETS'):
+    r.set('ASSETS', json.dumps({}))
+
+ASSETS = r.get('ASSETS')
+
 def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
