@@ -170,7 +170,8 @@ def tradingview_webhook():
     _risk = int(data['risk'])
 
     try:
-        resp = placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
+        _reduce = False
+        resp = placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk, _reduce)
         tag = resp
         if type(resp) == dict:
             tag = resp['retMsg']
@@ -257,86 +258,6 @@ def cancelOrder():
     print(_sym, _id)
     cancel = cancelAPI(_sym, _id)
     return cancel
-
-
-# @app.route('/getAssets', methods=['POST'])
-# def getAssets():
-#     pw = request.form ['pw']
-#     # if int(pw) != int(CODE):
-#     #     return {'error' : 'authentication code'}
-
-
-#     assets = json.loads(r.get('assets'))
-#     errors = json.loads(r.get('errors'))
-
-#     for a in assets:
-#         assets[a]['price'] = getTicker(a)
-#         TSlist = tradeStatus(a)
-#         logger.warning('TSList ' + str(TSlist))
-#         assets[a]['position'] = TSlist[0]
-#         assets[a]['lastlev'] = TSlist[1]
-#         assets[a]['lastsize'] = TSlist[2]
-#         assets[a]['errors'] = errors[a]
-
-#     return json.dumps(assets)
-
-
-# @app.route('/setAsset', methods=['POST'])
-# def setAsset():
-#     pw = request.form ['pw']
-#     if int(pw) != int(CODE):
-#         return {'error' : 'authentication error'}
-
-#     asset = request.form['asset']
-#     stop = request.form['stop']
-#     lev = request.form['lev']
-#     prop = request.form['prop']
-
-#     assets = json.loads(r.get('assets'))
-#     assets[asset]['stop'] = float(stop)
-#     assets[asset]['lev'] = float(lev)
-#     assets[asset]['prop'] = float(prop)
-
-#     r.set('assets', json.dumps(assets))
-
-#     return {'success' : 'assets updated'}
-
-# @app.route('/deleteAsset', methods=['POST'])
-# def deleteAsset():
-#     pw = request.form ['pw']
-#     if int(pw) != int(CODE):
-#         return {'error' : 'authentication error'}
-
-#     asset = request.form['asset']
-
-#     assets = json.loads(r.get('assets'))
-
-#     removedAsset = assets.pop(asset, asset +' not found')
-
-#     msg = "Removed Asset: " + asset
-#     logger.warning(msg)
-
-#     r.set('assets', json.dumps(assets))
-
-#     return {'success' : msg}
-
-# @app.route('/deleteMisc', methods=['POST'])
-# def deleteMisc():
-#     pw = request.form ['pw']
-#     if int(pw) != int(CODE):
-#         return {'error' : 'authentication error'}
-
-
-
-#     errors = json.loads(r.get('errors'))
-#     errors['misc'] = []
-
-#     msg = "Removed Misc Errors"
-#     logger.warning(msg)
-
-#     r.set('errors', json.dumps(errors))
-
-#     return {'success' : msg}
 
 
 if __name__ == '__main__':

@@ -163,6 +163,7 @@ def autoAdjust(_sym, _stop, _profit, _entry, _side):
 
     if action:
         resp = setSLTP(_sym, _profit, _stop)
+        placeReduce(_sym)
         return resp
     else:
         return False
@@ -231,15 +232,17 @@ def getOrders(_sym):
 
     ok = response['retMsg']
     print(f'getOrders {ok}')
-    #print(response['result'])
+    # print(response['result'])
 
     data = response['result']['list']
 
     if len(data) == 0:
         print(f'No orders on {_sym}')
-        return False
+        return {}
+    else:
+        return data
 
-    return True
+    return {}
 
 def getPosition(_sym):
     _cat = getCat(_sym)
@@ -267,7 +270,7 @@ def getPosition(_sym):
 
     # print(dataDict)
 
-    if dataDict['value'] == '' or int(dataDict['value']) == 0:
+    if dataDict['value'] == '' or float(dataDict['value']) == 0:
         print(f'No positions on {_sym}')
         return False
 
@@ -283,7 +286,7 @@ def checkValid(_sym):
     if getPosition(_sym):
         print(f'No Trade Action: Positions on {_sym}')
         return False
-    elif getOrders(_sym):
+    elif getOrders(_sym) == {}:
         print(f'No Trade Action: Orders on {_sym}')
         return False
     else:
@@ -387,12 +390,12 @@ def getQty(_sym, _amt, _lev, _entry):
 
     return rQty
 
-def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk):
+def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk, _reduce):
     _cat = getCat(_sym)
 
     print('CHECK VALID')
 
-    if not checkValid(_sym):
+    if _reduce == False and not checkValid(_sym):
         return 'Check Valid Fail'
 
     print('SET LEV')
@@ -420,13 +423,100 @@ def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk):
                 price=str(_entry),
                 stopLoss=str(_stop),
                 takeProfit=str(_profit),
-                positionIdx=_pidx
+                positionIdx=_pidx,
+                reduceOnly=False
             )
 
         return response
 
     except Exception as e:
         return str(e)
+
+
+def placeReduce(_sym):
+    _cat = getCat(_sym)
+    _type = 'Limit'
+
+    position = getPosition(_sym)
+    orders = getOrders(_sym)
+
+    currentPrice = 0
+    currentId = 0
+
+    print('ORDERS', orders)
+
+    for o in orders:
+        print(orders[0])
+        if o['orderType'] == 'Limit':
+            currentPrice = o['price']
+            currentId = o['orderId']
+
+    if not position:
+        print(f'No Positions on {_sym}')
+        return False
+
+    _side = position['side']
+    _stop = position['stop']
+    _profit = position['profit']
+    _lev = position['lev']
+    _value = position['value']
+    _size = position['size']
+
+
+    info = session.get_instruments_info(
+        category=_cat,
+        symbol=_sym,
+    )
+
+    tickSize = info['result']['list'][0]['priceFilter']['tickSize']
+    print('TICK', tickSize)
+
+    if currentPrice != 0 and abs(float(currentPrice) - float(_profit)) <= float(tickSize)*2:
+        print('NO REDUCE ADJUST')
+        return False
+
+
+    _oppSide = 'Sell'
+
+    if _side == 'Sell':
+        _oppSide = 'Buy'
+
+    if _side == 'Buy':
+        _entry = float(_profit) - float(tickSize)*2
+    else:
+        _entry = float(_profit) + float(tickSize)*2
+
+    _pidx = 0
+    # if _side == 'Sell':
+    #     _pidx = 2
+    #print('PDX', _pidx)
+    try:
+        print('TRY REDUCE')
+        if currentPrice != 0:
+            response = session.amend_order(
+                    category=_cat,
+                    symbol=_sym,
+                    orderId=currentId,
+                    price=str(_entry)
+                )
+        else:
+            response = session.place_order(
+                    category=_cat,
+                    symbol=_sym,
+                    side=_oppSide,
+                    orderType=_type,
+                    qty=str(_size),
+                    price=str(_entry),
+                    positionIdx=_pidx,
+                    reduceOnly=True
+                )
+
+        return True
+
+    except Exception as e:
+        print('REDUCE EXCEPTON', str(e))
+        return False
+
 
 
 # getPosition('ALGOUSDT')
@@ -458,8 +548,11 @@ _profit = float(data['profit'])
 _amt = int(data['amt'])
 _risk = int(data['risk'])
 
-# if LOCAL
-#     placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
+
+
+# if LOCAL:
+#     #placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
+#     placeReduce('AVAXUSDT')
 
 
 # getQty(_sym, _amt, 3.6, 0)
