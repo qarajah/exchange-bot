@@ -222,7 +222,7 @@ def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
     return resp
 
 
-def getOrders(_sym):
+def getOrders(_sym, dateReq):
     _cat = getCat(_sym)
 
     response = (session.get_open_orders(
@@ -236,13 +236,15 @@ def getOrders(_sym):
 
     data = response['result']['list']
 
-    if len(data) == 0:
-        print(f'No orders on {_sym}')
-        return {}
-    else:
+    if dataReq:
         return data
+    else:
+        if len(data) == 0:
+            print(f'No orders on {_sym}')
+            return False
+        else:
+            return True
 
-    return {}
 
 def getPosition(_sym):
     _cat = getCat(_sym)
@@ -286,7 +288,7 @@ def checkValid(_sym):
     if getPosition(_sym):
         print(f'No Trade Action: Positions on {_sym}')
         return False
-    elif getOrders(_sym) == {}:
+    elif getOrders(_sym, False):
         print(f'No Trade Action: Orders on {_sym}')
         return False
     else:
@@ -395,7 +397,7 @@ def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk, _reduce)
 
     print('CHECK VALID')
 
-    if _reduce == False and not checkValid(_sym):
+    if checkValid(_sym):
         return 'Check Valid Fail'
 
     print('SET LEV')
@@ -427,6 +429,8 @@ def placeOrder(_sym, _type, _side, _entry, _amt, _stop, _profit, _risk, _reduce)
                 reduceOnly=False
             )
 
+        placeReduce(_sym)
+
         return response
 
     except Exception as e:
@@ -438,7 +442,7 @@ def placeReduce(_sym):
     _type = 'Limit'
 
     position = getPosition(_sym)
-    orders = getOrders(_sym)
+    orders = getOrders(_sym, True)
 
     currentPrice = 0
     currentId = 0
@@ -525,6 +529,13 @@ def placeReduce(_sym):
 
 # print(getQty('ALGOUSDT', 100, 5))
 
+info = session.get_instruments_info(
+        category='linear',
+        symbol='NEARUSDT',
+    )
+
+tickSize = info['result']['list'][0]['priceFilter']['tickSize']
+print('TICK', tickSize)
 
 symx = 5
 _sym = assDict[symx]

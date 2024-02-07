@@ -116,11 +116,11 @@ def ping_webhook():
                 resp = autoAdjust(_sym, _stop, _profit, _entry, _side)
                 print('AUTO RESULT', resp)
                 if resp != False:
-                    sendMessage('AUTO ACTION ON '+ json.dumps(resp) )
+                    sendMessage('AUTO ACTION ON ' + _sym + json.dumps(resp) )
             else:
                 sendMessage('NO AUTO ACTION ON ' + t )
         except Exception as e:
-            print('AUTO EXCEPTION', e)
+            print('AUTO EXCEPTION ' + _sym, e)
 
         if t not in rTrades:
             sendMessage('TRADE OPEN ON ' + t)
