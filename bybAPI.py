@@ -287,12 +287,12 @@ def checkValid(_sym):
 
     if getPosition(_sym):
         print(f'No Trade Action: Positions on {_sym}')
-        return False
+        return True
     elif getOrders(_sym, False):
         print(f'No Trade Action: Orders on {_sym}')
-        return False
-    else:
         return True
+    else:
+        return False
 
 def getHL(side, current, stop, mode):
 
