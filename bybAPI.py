@@ -222,7 +222,7 @@ def adjustAPI(_sym, _mode, _stop, _profit, _entry, _side, _vwap):
     return resp
 
 
-def getOrders(_sym, dateReq):
+def getOrders(_sym, dataReq):
     _cat = getCat(_sym)
 
     response = (session.get_open_orders(
