@@ -8,20 +8,6 @@ session = HTTP(
     api_secret=API_SECRET,
 )
 
-assDict = {
-    1 : 'ALGOUSDT',
-    2 : 'ALICEUSDT',
-    3 : 'AVAXUSDT',
-    4 : 'BANDUSDT',
-    5 : 'BTCUSDT',
-    6 : 'ETHUSDT',
-    7 : 'MATICUSDT',
-    8 : 'NEARUSDT',
-    9 : 'REEFUSDT',
-    10 : 'RUNEUSDT',
-    11 : 'SOLUSDT',
-    12 : 'ORDIUSDT'
-}
 
 def getCat(_sym):
     _cat = 'inverse'
@@ -48,7 +34,7 @@ def cancelAPI(_sym, _id):
 
 def checkTrades():
     tradeDict={}
-    for _sym in assDict.values():
+    for _sym in ASSETS.keys():
         resp = session.get_positions(
             category="linear",
             symbol=_sym
@@ -84,7 +70,7 @@ def getLast(_sym):
 
 def checkOrders():
     orderDict={}
-    for _sym in assDict.values():
+    for _sym in ASSETS.keys():
         resp = session.get_open_orders(
             category="linear",
             symbol=_sym
@@ -447,7 +433,7 @@ def placeReduce(_sym):
     currentPrice = 0
     currentId = 0
 
-    print('ORDERS', orders)
+    print('ORDERS REDUCE', orders)
 
     for o in orders:
         print(orders[0])
@@ -473,7 +459,7 @@ def placeReduce(_sym):
     )
 
     tickSize = info['result']['list'][0]['priceFilter']['tickSize']
-    print('TICK', tickSize)
+    print('TICK REDUCE', tickSize)
 
     if currentPrice != 0 and abs(float(currentPrice) - float(_profit)) <= float(tickSize)*2:
         print('NO REDUCE ADJUST')
@@ -495,7 +481,7 @@ def placeReduce(_sym):
     #     _pidx = 2
     #print('PDX', _pidx)
     try:
-        print('TRY REDUCE')
+        print('TRY REDUCE: ' + _sym)
         if currentPrice != 0:
             response = session.amend_order(
                     category=_cat,
@@ -518,7 +504,7 @@ def placeReduce(_sym):
         return True
 
     except Exception as e:
-        print('REDUCE EXCEPTON', str(e))
+        print('REDUCE EXCEPTON: ' + _sym, str(e))
         return False
 
 
@@ -538,7 +524,7 @@ tickSize = info['result']['list'][0]['priceFilter']['tickSize']
 print('TICK', tickSize)
 
 symx = 5
-_sym = assDict[symx]
+_sym = 'USDT'
 _side = 'Sell'
 _type = 'Limit'
 _entry = 2393
@@ -563,7 +549,7 @@ _risk = int(data['risk'])
 
 # if LOCAL:
 #     #placeOrder(_sym,_type, _side, _entry, _amt, _stop, _profit, _risk)
-#     placeReduce('AVAXUSDT')
+#     placeReduce('ALGOUSDT')
 
 
 # getQty(_sym, _amt, 3.6, 0)

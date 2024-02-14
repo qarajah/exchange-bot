@@ -89,11 +89,18 @@ def ping_webhook():
         print(request.data)
         bDec = request.data.decode("utf-8")
         print(bDec)
-        data = json.loads(bDec)
-        r.set('vwaps', json.dumps(data))
+        vwapDict = json.loads(bDec)
+        r.set('vwaps', json.dumps(vwapDict))
     except Exception as e:
         print('PING EXCEPTION', e)
 
+    ASSETS = json.loads(r.get('ASSETS'))
+
+    for A in ASSETS.keys():
+        if A not in vwapDict.keys()
+        ASSETS[A]={}
+
+    r.set('ASSETS', json.dumps(ASSETS))
 
     trades = checkTrades()
     rTrades = {}
