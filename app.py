@@ -97,8 +97,8 @@ def ping_webhook():
     ASSETS = json.loads(r.get('ASSETS'))
 
     for A in vwapDict.keys():
-        if A not in ASSETS.keys():
-            ASSETS[A]={}
+        if A + 'USDT' not in ASSETS.keys():
+            ASSETS[A + 'USDT']={}
 
     r.set('ASSETS', json.dumps(ASSETS))
 

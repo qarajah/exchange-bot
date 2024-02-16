@@ -35,6 +35,7 @@ def cancelAPI(_sym, _id):
 def checkTrades():
     tradeDict={}
     for _sym in ASSETS.keys():
+        print(_sym)
         resp = session.get_positions(
             category="linear",
             symbol=_sym
