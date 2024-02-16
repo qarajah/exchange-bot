@@ -71,6 +71,7 @@ def getLast(_sym):
 
 def checkOrders():
     orderDict={}
+    print(ASSETS.keys())
     for _sym in ASSETS.keys():
         resp = session.get_open_orders(
             category="linear",

@@ -46,6 +46,9 @@ if not r.get('ASSETS'):
 
 ASSETS = json.loads(r.get('ASSETS'))
 
+if 'TESTUSDT' in ASSETS:
+    del ASSETS['TESTUSDT']
+
 def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):

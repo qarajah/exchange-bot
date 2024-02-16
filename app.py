@@ -149,14 +149,14 @@ def tradingview_webhook():
         data = json.loads(request.data)
     except Exception as e:
         logger.warning('DATA LOAD EXCEPTION ' + str(e))
-        addAlert('tradingview', 'Invalid json data')
+        #addAlert('tradingview', 'Invalid json data')
         return 'ERROR'
     logger.warning('TV DATA' +  json.dumps(data))
 
     try:
-        ##logger.warning(data['TVCODE'])
+        logger.warning(data['TVCODE'])
         if not data['code']:
-            addAlert('tradingview', 'No TVCODE found in webhook alert')
+            #addAlert('tradingview', 'No TVCODE found in webhook alert')
             return 'ERROR'
         elif int(data['code']) != int(CODE):
             addAlert('tradingview', 'TVCODE in webhook alert is incorrect')
