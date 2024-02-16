@@ -44,7 +44,7 @@ if REDIS_URL:
 if not r.get('ASSETS'):
     r.set('ASSETS', json.dumps({}))
 
-ASSETS = r.get('ASSETS')
+ASSETS = json.loads(r.get('ASSETS'))
 
 def auth_required(f):
     @wraps(f)
