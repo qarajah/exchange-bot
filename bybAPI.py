@@ -135,7 +135,8 @@ def autoAdjust(_sym, _stop, _profit, _entry, _side):
                 _stop = newStop
                 action = True
         elif last_price > _entry + _diff*0.4 and _stop < _entry:
-            _stop = _entry
+            newStop = _entry - _diff*0.4
+            _stop = newStop
             action = True
     else:
         _diff = _entry - _profit
@@ -146,7 +147,8 @@ def autoAdjust(_sym, _stop, _profit, _entry, _side):
                 action = True
 
         elif last_price < _entry - _diff*0.4 and _stop > _entry:
-            _stop = _entry
+            newStop = _entry + _diff*0.4
+            _stop = newStop
             action = True
 
     if action:
