@@ -35,26 +35,29 @@ def cancelAPI(_sym, _id):
 def checkTrades():
     tradeDict={}
     for _sym in ASSETS.keys():
-        print(_sym)
-        resp = session.get_positions(
-            category="linear",
-            symbol=_sym
-        )
+        try:
+            print(_sym)
+            resp = session.get_positions(
+                category="linear",
+                symbol=_sym
+            )
 
-        trade = resp['result']['list'][0]
-        _size = trade['positionBalance']
-        if _size != '' and _size != '0':
-            tradeDict[_sym] = {
-                'lev' : trade['leverage'],
-                'size' : _size,
-                'entry' : trade['avgPrice'],
-                'side' : trade['side'],
-                'profit' : trade['takeProfit'],
-                'stop' : trade['stopLoss'],
-                'time' : trade['updatedTime'],
-                'gains' : trade['unrealisedPnl']
-            }
-            print(resp)
+            trade = resp['result']['list'][0]
+            _size = trade['positionBalance']
+            if _size != '' and _size != '0':
+                tradeDict[_sym] = {
+                    'lev' : trade['leverage'],
+                    'size' : _size,
+                    'entry' : trade['avgPrice'],
+                    'side' : trade['side'],
+                    'profit' : trade['takeProfit'],
+                    'stop' : trade['stopLoss'],
+                    'time' : trade['updatedTime'],
+                    'gains' : trade['unrealisedPnl']
+                }
+                print(resp)
+        except:
+            print('ASSET not found', _sym)
     print(tradeDict)
     return tradeDict
 
@@ -73,34 +76,37 @@ def checkOrders():
     orderDict={}
     print(ASSETS.keys())
     for _sym in ASSETS.keys():
-        resp = session.get_open_orders(
-            category="linear",
-            symbol=_sym
-        )
+        try:
+            resp = session.get_open_orders(
+                category="linear",
+                symbol=_sym
+            )
 
-        last_price = getLast(_sym)
+            last_price = getLast(_sym)
 
 
-        orders = resp['result']['list']
+            orders = resp['result']['list']
 
-        if len(orders) > 0:
-            for order in orders:
-                print(order)
-                if _sym not in orderDict:
-                    orderDict[_sym] = []
+            if len(orders) > 0:
+                for order in orders:
+                    print(order)
+                    if _sym not in orderDict:
+                        orderDict[_sym] = []
 
-                if order['price'] != '' and order['price'] != '0':
-                    orderDict[_sym].append({
-                        'last_price' : last_price,
-                        'entry' : float(order['price']),
-                        'profit' : order['takeProfit'],
-                        'stop' : order['stopLoss'],
-                        'time' : order['updatedTime'],
-                        'side' : order['side'],
-                        'qty' : order['qty'],
-                        'id' : order['orderId'],
-                        'reduce' : order['reduceOnly']
-                    })
+                    if order['price'] != '' and order['price'] != '0':
+                        orderDict[_sym].append({
+                            'last_price' : last_price,
+                            'entry' : float(order['price']),
+                            'profit' : order['takeProfit'],
+                            'stop' : order['stopLoss'],
+                            'time' : order['updatedTime'],
+                            'side' : order['side'],
+                            'qty' : order['qty'],
+                            'id' : order['orderId'],
+                            'reduce' : order['reduceOnly']
+                        })
+        except:
+            print('CHECK ORDER ASSET NOT FOUND', _sym)
 
     return orderDict
 
